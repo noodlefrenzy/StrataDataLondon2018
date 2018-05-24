@@ -1,0 +1,17 @@
+## generate the schema
+python score_cluster.py
+
+## register and upload the model
+az ml model register --model [path to modelfile.model] --name your_model
+
+##create a manifest
+az ml manifest create --manifest-name your_manifest -f score_cluster.py -r python --model-id [model-id from previous step]
+
+## create a container instance imaged with your dependencies
+az ml image create -n yourcontimgname --manifest-id [manifest-id from prev step] -c conda_dependencies_score.yml
+
+## create a web service
+az ml service create realtime --image-id [image-id from prev step] -n yourws -s [service_schema.json generated during first step]
+
+## visualize logs
+az ml service logs realtime -i yourws.yourclusterenvdns.westeurope
